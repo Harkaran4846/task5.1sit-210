@@ -3,85 +3,88 @@ import tkinter.font as tkFont
 import RPi.GPIO as GPIO
 from gpiozero import LED
 
-# Initialize GPIO using BCM mode
+# Initialize GPIO using BCM mode (GPIO numbers instead of physical pin numbers)
 GPIO.setmode(GPIO.BCM)
 
-# LED setup on respective GPIO pins
+# Define LEDs connected to specific GPIO pins
 leds = {
-    'red': LED(6),
-    'blue': LED(16),
-    'green': LED(21)
+    'red': LED(6),      # Red LED connected to GPIO pin 6
+    'blue': LED(16),    # Blue LED connected to GPIO pin 16
+    'green': LED(21)    # Green LED connected to GPIO pin 21
 }
 
 # Initialize Tkinter window
 window = Tk()
-window.title("Shuffled LED Controller")
-font_style = tkFont.Font(family='Arial', size=14, weight='bold')
+window.title("Shuffled LED Controller")  # Set the title of the window
+font_style = tkFont.Font(family='Arial', size=14, weight='bold')  # Font style for labels and buttons
 
-# Define toggle states for LEDs
+# Define initial toggle states for LEDs (all off at start)
 led_states = {
-    'red': False,
-    'blue': False,
-    'green': False
+    'red': False,   # Red LED is off
+    'blue': False,  # Blue LED is off
+    'green': False  # Green LED is off
 }
 
-# Function to update button text
+# Function to update the button text based on LED state
 def update_button_text():
-    red_btn.config(text="Turn RED OFF" if led_states['red'] else "Turn RED ON")
-    blue_btn.config(text="Turn BLUE OFF" if led_states['blue'] else "Turn BLUE ON")
-    green_btn.config(text="Turn GREEN OFF" if led_states['green'] else "Turn GREEN ON")
+    red_btn.config(text="Turn RED OFF" if led_states['red'] else "Turn RED ON")  # Update red button text
+    blue_btn.config(text="Turn BLUE OFF" if led_states['blue'] else "Turn BLUE ON")  # Update blue button text
+    green_btn.config(text="Turn GREEN OFF" if led_states['green'] else "Turn GREEN ON")  # Update green button text
 
-# Function to toggle a specific LED
+# Function to toggle the specified LED and turn others off
 def toggle_led(color):
-    for led_color, led in leds.items():
-        if led_color == color:
-            if led_states[led_color]:
+    for led_color, led in leds.items():  # Loop through all LEDs
+        if led_color == color:  # If the current LED is the one to toggle
+            if led_states[led_color]:  # If the LED is on, turn it off
                 led.off()
-            else:
+            else:  # If the LED is off, turn it on
                 led.on()
-            led_states[led_color] = not led_states[led_color]
+            led_states[led_color] = not led_states[led_color]  # Update the LED state (toggle)
         else:
-            led.off()
-            led_states[led_color] = False
-    update_button_text()
+            led.off()  # Turn off other LEDs
+            led_states[led_color] = False  # Set their state to False
+    update_button_text()  # Update button text after changing states
 
-# Close window and cleanup GPIO
+# Function to handle window close event (cleanup GPIO and close window)
 def close_window():
-    GPIO.cleanup()
-    window.destroy()
+    GPIO.cleanup()  # Cleanup all GPIO pins used in the program
+    window.destroy()  # Close the Tkinter window
 
-# Header label
-header_label = Label(window, text="LED Control Panel", font=font_style, pady=10)
-header_label.grid(row=0, column=0, columnspan=2, padx=20, pady=10)
+# Header label for the GUI
+header_label = Label(window, text="LED Control Panel", font=font_style, pady=10)  # Create header label
+header_label.grid(row=0, column=0, columnspan=2, padx=20, pady=10)  # Place header label in the grid layout
 
-# Shuffled LED control layout
-# Blue LED controls at the top
-blue_label = Label(window, text="BLUE LED", font=font_style, fg="blue")
-blue_label.grid(row=1, column=0, padx=20, pady=10)
+# Blue LED controls (label and button)
+blue_label = Label(window, text="BLUE LED", font=font_style, fg="blue")  # Label for blue LED
+blue_label.grid(row=1, column=0, padx=20, pady=10)  # Place label in grid
 
 blue_btn = Button(window, text="Turn BLUE ON", font=font_style, command=lambda: toggle_led('blue'), bg='blue', height=2, width=15)
-blue_btn.grid(row=1, column=1, padx=20, pady=10)
+# Button for toggling blue LED
+blue_btn.grid(row=1, column=1, padx=20, pady=10)  # Place button in grid
 
-# Green LED controls in the middle
-green_label = Label(window, text="GREEN LED", font=font_style, fg="green")
-green_label.grid(row=2, column=0, padx=20, pady=10)
+# Green LED controls (label and button)
+green_label = Label(window, text="GREEN LED", font=font_style, fg="green")  # Label for green LED
+green_label.grid(row=2, column=0, padx=20, pady=10)  # Place label in grid
 
 green_btn = Button(window, text="Turn GREEN ON", font=font_style, command=lambda: toggle_led('green'), bg='green', height=2, width=15)
-green_btn.grid(row=2, column=1, padx=20, pady=10)
+# Button for toggling green LED
+green_btn.grid(row=2, column=1, padx=20, pady=10)  # Place button in grid
 
-# Red LED controls at the bottom
-red_label = Label(window, text="RED LED", font=font_style, fg="red")
-red_label.grid(row=3, column=0, padx=20, pady=10)
+# Red LED controls (label and button)
+red_label = Label(window, text="RED LED", font=font_style, fg="red")  # Label for red LED
+red_label.grid(row=3, column=0, padx=20, pady=10)  # Place label in grid
 
 red_btn = Button(window, text="Turn RED ON", font=font_style, command=lambda: toggle_led('red'), bg='red', height=2, width=15)
-red_btn.grid(row=3, column=1, padx=20, pady=10)
+# Button for toggling red LED
+red_btn.grid(row=3, column=1, padx=20, pady=10)  # Place button in grid
 
-# Exit button at the bottom
+# Exit button to close the window and clean up resources
 exit_btn = Button(window, text="EXIT", font=font_style, command=close_window, bg='yellow', height=2, width=30)
-exit_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
+# Button to close the window
+exit_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=20)  # Place exit button at the bottom
 
-# Handle window close event
-window.protocol("WM_DELETE_WINDOW", close_window)
+# Handle the window close event to ensure GPIO is cleaned up properly
+window.protocol("WM_DELETE_WINDOW", close_window)  # Bind the window close event to cleanup function
 
-# Run the Tkinter main loop
+# Run the Tkinter main loop to display the window and handle events
 window.mainloop()
