@@ -1,9 +1,9 @@
-from tkinter import *
-import tkinter.font as tkFont
-import RPi.GPIO as GPIO
-from gpiozero import LED
+from tkinter import *           # Import Tkinter for GUI
+import tkinter.font as tkFont    # Import font module for customizing text styles
+import RPi.GPIO as GPIO          # Import RPi.GPIO for GPIO control
+from gpiozero import LED         # Import LED class from gpiozero for easy LED handling
 
-# Initialize GPIO using BCM mode (GPIO numbers instead of physical pin numbers)
+# Initialize GPIO using BCM mode (GPIO numbering rather than physical pin numbers)
 GPIO.setmode(GPIO.BCM)
 
 # Define LEDs connected to specific GPIO pins
@@ -16,16 +16,16 @@ leds = {
 # Initialize Tkinter window
 window = Tk()
 window.title("Shuffled LED Controller")  # Set the title of the window
-font_style = tkFont.Font(family='Arial', size=14, weight='bold')  # Font style for labels and buttons
+font_style = tkFont.Font(family='Arial', size=14, weight='bold')  # Define font style for labels and buttons
 
-# Define initial toggle states for LEDs (all off at start)
+# Define initial toggle states for LEDs (all start in the off position)
 led_states = {
-    'red': False,   # Red LED is off
-    'blue': False,  # Blue LED is off
-    'green': False  # Green LED is off
+    'red': False,   # Red LED is initially off
+    'blue': False,  # Blue LED is initially off
+    'green': False  # Green LED is initially off
 }
 
-# Function to update the button text based on LED state
+# Function to update the button text based on each LED's state
 def update_button_text():
     red_btn.config(text="Turn RED OFF" if led_states['red'] else "Turn RED ON")  # Update red button text
     blue_btn.config(text="Turn BLUE OFF" if led_states['blue'] else "Turn BLUE ON")  # Update blue button text
@@ -34,24 +34,24 @@ def update_button_text():
 # Function to toggle the specified LED and turn others off
 def toggle_led(color):
     for led_color, led in leds.items():  # Loop through all LEDs
-        if led_color == color:  # If the current LED is the one to toggle
+        if led_color == color:  # If the current LED matches the one to toggle
             if led_states[led_color]:  # If the LED is on, turn it off
                 led.off()
             else:  # If the LED is off, turn it on
                 led.on()
-            led_states[led_color] = not led_states[led_color]  # Update the LED state (toggle)
+            led_states[led_color] = not led_states[led_color]  # Toggle the LED state
         else:
-            led.off()  # Turn off other LEDs
-            led_states[led_color] = False  # Set their state to False
-    update_button_text()  # Update button text after changing states
+            led.off()  # Turn off all other LEDs
+            led_states[led_color] = False  # Set their states to off
+    update_button_text()  # Update button text to reflect the new states
 
-# Function to handle window close event (cleanup GPIO and close window)
+# Function to handle the window close event (clean up GPIO and close window)
 def close_window():
-    GPIO.cleanup()  # Cleanup all GPIO pins used in the program
+    GPIO.cleanup()  # Clean up all GPIO pins used in the program
     window.destroy()  # Close the Tkinter window
 
 # Header label for the GUI
-header_label = Label(window, text="LED Control Panel", font=font_style, pady=10)  # Create header label
+header_label = Label(window, text="LED Control Panel", font=font_style, pady=10)  # Create a header label
 header_label.grid(row=0, column=0, columnspan=2, padx=20, pady=10)  # Place header label in the grid layout
 
 # Blue LED controls (label and button)
@@ -84,7 +84,7 @@ exit_btn = Button(window, text="EXIT", font=font_style, command=close_window, bg
 exit_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=20)  # Place exit button at the bottom
 
 # Handle the window close event to ensure GPIO is cleaned up properly
-window.protocol("WM_DELETE_WINDOW", close_window)  # Bind the window close event to cleanup function
+window.protocol("WM_DELETE_WINDOW", close_window)  # Bind the window close event to the cleanup function
 
 # Run the Tkinter main loop to display the window and handle events
 window.mainloop()
